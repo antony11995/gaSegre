@@ -1,0 +1,33 @@
+{% include 'header.html' %} 
+
+<div class="container">
+
+  <table class="table table-hover">
+     <thead class="thead-light">
+             
+         <tr>
+             <th>Id cuenta GA</th>
+             <th>Cuenta</th>
+             <th>Opciones</th>
+         </tr>
+         
+     </thead>
+     <tbody>
+         {% for cuenta in cuentasGA %}  
+         <tr>
+             <td class="col-1">{{cuenta[0]}}</td>
+             <td class="col-1"><a class="btn btn-info btn-sm" href="/consultaCuenta/{{cuenta[0]}}">{{cuenta[1]}}</a>
+             </td>
+             <td class="col-3"><button type="button" class="btn btn-primary"><i class="bi bi-star-fill"></i> Top 100</button></td>
+             
+         </tr>
+         {% endfor %}
+     </tbody>
+ </table>
+ 
+ </div>  
+
+          
+
+
+{% include 'footer.html' %} 

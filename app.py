@@ -30,7 +30,7 @@ def consultaporNombre(id):
     return nombreCuenta  
 
 
-@app.route('/consultaCuenta/<int:id>')
+@app.route('/consultaCuenta/<int:id>', methods=['POST','GET'])
 def consultaCuenta(id):
     conn=mysql.connect()
     cursor=conn.cursor()
@@ -46,7 +46,7 @@ def consultaCuenta(id):
  
 
 
-@app.route('/top100/<int:id>')
+@app.route('/top100/<int:id>', methods=['POST','GET'])
 def top100(id):
     sql="SELECT fecha, duracion_sesion, sesiones FROM sesiones_ga WHERE id_cuenta=%s ORDER BY sesiones DESC LIMIT 100;"
     conn=mysql.connect()
@@ -56,7 +56,11 @@ def top100(id):
     conn.commit()
     nombreCuenta=consultaporNombre(id)    
     return render_template('/top100.html',registrosTop100=registrosTop100,nombreCuenta=nombreCuenta)
-   
+
+@app.route('/chart/<int:id>', methods=['POST','GET'])
+def chart(id):
+    nombreCuenta=consultaporNombre(id) 
+    return render_template('/chart.html',nombreCuenta=nombreCuenta) 
 
 if __name__=='__main__':
     app.run(debug=True)

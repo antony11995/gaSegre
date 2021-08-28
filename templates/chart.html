@@ -1,5 +1,44 @@
 {% include 'header.html' %} 
 <form method="post" action="/chart">
     
+    {% for titulo in nombreCuenta %}
+    <h3>{{titulo[0]}}</h3>   
+    {% endfor %}
+    
+
+    <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
+    <script>
+        var ctx = document.getElementById("myChart");
+        var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            datasets: [{
+              label: 'Sesiones',  
+              data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
+              lineTension: 0,
+              backgroundColor: 'transparent',
+              borderColor: '#007bff',
+              borderWidth: 4,
+              pointBackgroundColor: '#007bff'
+            }]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: false
+                }
+              }]
+            },
+            legend: {
+              display: false,
+            }
+          }
+        });
+      </script>
+    
+    
 </form>
+
 {% include 'footer.html' %} 

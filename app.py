@@ -61,4 +61,4 @@ def top100(id):
 if __name__=='__main__':
     app.run(debug=True)
 
-#SELECT * FROM sesiones_ga WHERE id_cuenta=93372212 ORDER BY sesiones DESC LIMIT 100;    
+  

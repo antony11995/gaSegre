@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, request, redirect, url_for
 from flaskext.mysql import MySQL
+import pdfkit
 
 app= Flask(__name__)
 mysql =MySQL()
@@ -75,8 +76,13 @@ def chart(id):
     registrosCuenta = cursor.fetchall() 
     conn.commit()  
     nombreCuenta=consultaporNombre(id)
-    
     return render_template('/chart.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta) 
+
+@app.route('/exportarGrafico/', methods=['GET', 'POST'])
+def exportarGrafico():
+    print("ha entrado a la funcion exportar")
+    pdfkit.from_file('templates/chart.html', 'demo_from_file.pdf')
+    return render_template('/')   
 
 if __name__=='__main__':
     app.run(debug=True)

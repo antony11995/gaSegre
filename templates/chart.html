@@ -1,12 +1,49 @@
 {% include 'header.html' %} 
 <form method="post" action="/chart">
     
-    {% for titulo in nombreCuenta %}
-    <h3>{{titulo[0]}}</h3>   
-    {% endfor %}
     
+    
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        {% for titulo in nombreCuenta %}
+        <h3>{{titulo[0]}}</h3>   
+        {% endfor %}
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group mr-2">
+            <a class="btn btn-sm btn-outline-secondary" href="/exportarGrafico" >Exportar</a>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle = "dropdown">         
+            Mes
+          <span class = "caret"></span>
+          </button>
+          <ul class >
+          <li class= "dropdown-menu" role = "menu">
+            
+              <a class="dropdown-item" href="#">Semana</a>
+              <a class="dropdown-item" href="#">Mes</a>
+              <a class="dropdown-item" href="#">A&ntilde;o </a>
+            
+          </li>
+        </ul>
 
-    <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
+          <!-- <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle = "dropdown">         
+            Default
+          <span class = "caret"></span>
+          </button>
+          <ul class >
+            <li><a href = "#"></a></li>
+            <li class = "divider"></li>
+            <li><a href = "#">Mes</a></li>
+            <li class = "divider"></li>
+            <li><a href = "#"></a></li>
+         </ul> -->
+        </div>
+      </div>
+
+
+
+
+    <canvas class="my-4" id="myChart" width="1000" height="600"></canvas>
     <script>
         
         //var labeltitle = '{{ registrosCuenta}}';
@@ -62,5 +99,6 @@
     
     
 </form>
+
 
 {% include 'footer.html' %} 

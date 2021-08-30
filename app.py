@@ -1,7 +1,8 @@
 from flask import Flask
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, make_response
 from flaskext.mysql import MySQL
 import pdfkit
+from werkzeug.wrappers import response
 
 app= Flask(__name__)
 mysql =MySQL()
@@ -60,29 +61,42 @@ def top100(id):
     nombreCuenta=consultaporNombre(id)    
     return render_template('/top100.html',registrosTop100=registrosTop100,nombreCuenta=nombreCuenta)
 
-@app.route('/chart/<int:id>', methods=['POST','GET'])
-def chart(id):
+@app.route('/chart/<int:id>/<int:sl>', methods=['POST','GET'])
+def chart(id,sl):
     
     conn=mysql.connect()
     cursor=conn.cursor()
-    # cursor.execute("SELECT \
-    # DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
-    # FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
-    # ON t1.id_cuenta = t2.id WHERE t2.id=%s AND fecha>='2021-08-09'ORDER BY fecha ASC LIMIT 7;",id)
-    cursor.execute("SELECT \
-    DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
-    FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
-    ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",id)
+    if sl==0:
+            cursor.execute("SELECT \
+            DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+            FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+            ON t1.id_cuenta = t2.id WHERE t2.id=%s AND fecha>='2021-08-09'ORDER BY fecha ASC LIMIT 7;",id)
+    elif sl==1:
+            cursor.execute("SELECT \
+            DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+            FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+            ON t1.id_cuenta = t2.id WHERE t2.id=%s AND fecha>='2021-07-17'ORDER BY fecha ASC LIMIT 30;",id)
+    else:
+            cursor.execute("SELECT \
+            DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+            FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+            ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",id)
+        
+
     registrosCuenta = cursor.fetchall() 
     conn.commit()  
     nombreCuenta=consultaporNombre(id)
-    return render_template('/chart.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta) 
+    return render_template('/chart.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta,id=id) 
 
-@app.route('/exportarGrafico/', methods=['GET', 'POST'])
-def exportarGrafico():
-    print("ha entrado a la funcion exportar")
-    pdfkit.from_file('templates/chart.html', 'demo_from_file.pdf')
-    return render_template('/')   
+@app.route('/exportarGrafico/<int:id>', methods=['GET', 'POST'])
+def exportarGrafico(id):
+    rendered=chart(id)
+    #pdf=pdfkit.from_string(rendered,False)
+    pdfkit.from_file('/chart.html','out.pdf')
+    # response=make_response(pdf)
+    # response.headers['Content-Type']='application/pdf'
+    # response.headers['Content-Disposition']='inline;filename=output.pdf'
+    return render_template('/')
 
 if __name__=='__main__':
     app.run(debug=True)

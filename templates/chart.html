@@ -10,55 +10,40 @@
         {% endfor %}
         <div class="btn-toolbar mb-2 mb-md-0">
           <div class="btn-group mr-2">
-            <a class="btn btn-sm btn-outline-secondary" href="/exportarGrafico" >Exportar</a>
+            
+            <!-- <a class="btn btn-sm btn-outline-secondary" href="/exportarGrafico/{{id}}" >Exportar</a> -->
+            
           </div>
           <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle = "dropdown">         
-            Mes
+            Semana
           <span class = "caret"></span>
           </button>
           <ul class >
           <li class= "dropdown-menu" role = "menu">
             
-              <a class="dropdown-item" href="#">Semana</a>
-              <a class="dropdown-item" href="#">Mes</a>
-              <a class="dropdown-item" href="#">A&ntilde;o </a>
-            
+              <a class="dropdown-item" href="/chart/{{id}}/0">Semana</a>
+              <a class="dropdown-item" href="/chart/{{id}}/1">Mes</a>
+              <a class="dropdown-item" href="/chart/{{id}}/2">A&ntilde;o </a>              
+              <a class="dropdown-item" href="/chart/{{id}}/3">Personalizado </a>
           </li>
         </ul>
 
-          <!-- <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle = "dropdown">         
-            Default
-          <span class = "caret"></span>
-          </button>
-          <ul class >
-            <li><a href = "#"></a></li>
-            <li class = "divider"></li>
-            <li><a href = "#">Mes</a></li>
-            <li class = "divider"></li>
-            <li><a href = "#"></a></li>
-         </ul> -->
+          
         </div>
       </div>
 
 
 
 
-    <canvas class="my-4" id="myChart" width="1000" height="600"></canvas>
+    <canvas class="my-4" id="myChart" width="900" height="600" ></canvas>
     <script>
         
-        //var labeltitle = '{{ registrosCuenta}}';
-
-
-
-
-
 
         var ctx = document.getElementById("myChart");
         var myChart = new Chart(ctx, {
           type: 'line',
           data: {
-             //labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-             
+                         
             labels: [
             {% for item in registrosCuenta %}
             "{{ item [0]}}",

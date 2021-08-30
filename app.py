@@ -10,6 +10,8 @@ app.config['MYSQL_DATABASE_PASSWORD']='ga.segre'
 app.config['MYSQL_DATABASE_DB']='gasegre'
 mysql.init_app(app)
 
+
+
 @app.route('/')
 def index():
     sql="SELECT * FROM `cuentas_ga`;"
@@ -35,7 +37,7 @@ def consultaCuenta(id):
     conn=mysql.connect()
     cursor=conn.cursor()
     cursor.execute("SELECT \
-    t1.`fecha`,t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+    DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
     FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
     ON t1.id_cuenta = t2.id WHERE t2.id=%s   GROUP BY sesiones DESC",id)
     registrosCuenta = cursor.fetchall() 
@@ -48,7 +50,7 @@ def consultaCuenta(id):
 
 @app.route('/top100/<int:id>', methods=['POST','GET'])
 def top100(id):
-    sql="SELECT fecha, duracion_sesion, sesiones FROM sesiones_ga WHERE id_cuenta=%s ORDER BY sesiones DESC LIMIT 100;"
+    sql="SELECT DATE_FORMAT(fecha, '%%d/%%m/%%Y'), duracion_sesion, sesiones FROM sesiones_ga WHERE id_cuenta=%s ORDER BY sesiones DESC LIMIT 100;"
     conn=mysql.connect()
     cursor=conn.cursor()
     cursor.execute(sql,id)
@@ -59,8 +61,22 @@ def top100(id):
 
 @app.route('/chart/<int:id>', methods=['POST','GET'])
 def chart(id):
-    nombreCuenta=consultaporNombre(id) 
-    return render_template('/chart.html',nombreCuenta=nombreCuenta) 
+    
+    conn=mysql.connect()
+    cursor=conn.cursor()
+    # cursor.execute("SELECT \
+    # DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+    # FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+    # ON t1.id_cuenta = t2.id WHERE t2.id=%s AND fecha>='2021-08-09'ORDER BY fecha ASC LIMIT 7;",id)
+    cursor.execute("SELECT \
+    DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+    FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+    ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",id)
+    registrosCuenta = cursor.fetchall() 
+    conn.commit()  
+    nombreCuenta=consultaporNombre(id)
+    
+    return render_template('/chart.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta) 
 
 if __name__=='__main__':
     app.run(debug=True)

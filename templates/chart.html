@@ -8,14 +8,36 @@
 
     <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
     <script>
+        
+        //var labeltitle = '{{ registrosCuenta}}';
+
+
+
+
+
+
         var ctx = document.getElementById("myChart");
         var myChart = new Chart(ctx, {
           type: 'line',
           data: {
-            labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+             //labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+             
+            labels: [
+            {% for item in registrosCuenta %}
+            "{{ item [0]}}",
+            {% endfor %}
+            
+
+            ],
+                      
             datasets: [{
               label: 'Sesiones',  
-              data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
+              data: [
+              {% for sesiones in registrosCuenta %}
+              "{{ sesiones [2]}}",
+              {% endfor %}
+            
+            ],
               lineTension: 0,
               backgroundColor: 'transparent',
               borderColor: '#007bff',

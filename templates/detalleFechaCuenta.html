@@ -1,5 +1,5 @@
 {% include 'header.html' %} 
-<form method="POST" action="/consultaCuenta">
+<form method="POST" action="/detalleFechaCuenta">
      
     {% for titulo in nombreCuenta %}
     <h3>{{titulo[0]}}</h3>   
@@ -14,8 +14,8 @@
                 
                 <tr>
                     <th>Fecha</th>
-                    <th>Duraci&oacute;n</th>
-                    <th>Sesiones</th>
+                    <th>Web</th>
+                    <th>Visitas</th>
                 </tr>
                 
             </thead>

@@ -39,15 +39,27 @@ def consultaCuenta(id):
     conn=mysql.connect()
     cursor=conn.cursor()
     cursor.execute("SELECT \
-    DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+    DATE_FORMAT(t1.`fecha`, '%%d-%%m-%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
     FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
     ON t1.id_cuenta = t2.id WHERE t2.id=%s   GROUP BY sesiones DESC",id)
     registrosCuenta = cursor.fetchall() 
     conn.commit()  
     nombreCuenta=consultaporNombre(id)
-    return render_template('/consultaCuenta.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta)
+    return render_template('/consultaCuenta.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta,id=id)
 
- 
+@app.route('/detalleFechaCuenta/<int:id>/fecha', methods=['POST','GET'])
+def detalleFechaCuenta(id,fecha):
+    conn=mysql.connect()
+    cursor=conn.cursor()
+    cursor.execute("SELECT \
+    DATE_FORMAT(t1.`fecha`, '%%d-%%m-%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+    FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+    ON t1.id_cuenta = t2.id WHERE t2.id=%s AND DATE_FORMAT(t1.`fecha`, '%%Y-%%m-%%d')",id,fecha)
+    registrosCuenta = cursor.fetchall() 
+    conn.commit()  
+    nombreCuenta=consultaporNombre(id)
+    print(registrosCuenta)
+    return render_template('/detalleFechaCuenta.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta) 
 
 
 @app.route('/top100/<int:id>', methods=['POST','GET'])

@@ -47,19 +47,20 @@ def consultaCuenta(id):
     nombreCuenta=consultaporNombre(id)
     return render_template('/consultaCuenta.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta,id=id)
 
-@app.route('/detalleFechaCuenta/<int:id>/fecha', methods=['POST','GET'])
+@app.route('/detalleFechaCuenta/<int:id>/<fecha>', methods=['POST','GET'])
 def detalleFechaCuenta(id,fecha):
+    datos=(fecha,id)
     conn=mysql.connect()
     cursor=conn.cursor()
     cursor.execute("SELECT \
     DATE_FORMAT(t1.`fecha`, '%%d-%%m-%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
     FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
-    ON t1.id_cuenta = t2.id WHERE t2.id=%s AND DATE_FORMAT(t1.`fecha`, '%%Y-%%m-%%d')",id,fecha)
+    ON t1.id_cuenta = t2.id WHERE  STR_TO_DATE(fecha, '%%Y-%%m-%%d') = STR_TO_DATE(%s, '%%d-%%m-%%Y') AND (t2.id=%s)",datos)
     registrosCuenta = cursor.fetchall() 
     conn.commit()  
     nombreCuenta=consultaporNombre(id)
     print(registrosCuenta)
-    return render_template('/detalleFechaCuenta.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta) 
+    return render_template('/detalleFechaCuenta.html',id=id,fecha=fecha) 
 
 
 @app.route('/top100/<int:id>', methods=['POST','GET'])

@@ -101,6 +101,19 @@ def chart(id,sl):
     nombreCuenta=consultaporNombre(id)
     return render_template('/chart.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta,id=id) 
 
+@app.route('/comparativo', methods=['GET', 'POST'])
+def comparativo():
+    sql="SELECT * FROM `cuentas_ga`;"
+    conn=mysql.connect()
+    cursor=conn.cursor()
+    cursor.execute(sql)
+    cuentasGA = cursor.fetchall() 
+    conn.commit()
+    if request.method == 'POST':
+        print(request.form.getlist('cuentas'))    
+    return render_template('/comparativo.html',cuentasGA=cuentasGA)
+
+
 @app.route('/exportarGrafico/<int:id>', methods=['GET', 'POST'])
 def exportarGrafico(id):
     rendered=chart(id)

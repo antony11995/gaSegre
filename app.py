@@ -109,9 +109,26 @@ def comparativo():
     cursor.execute(sql)
     cuentasGA = cursor.fetchall() 
     conn.commit()
+    list = []
     if request.method == 'POST':
-        print(request.form.getlist('cuentas'))    
-    return render_template('/comparativo.html',cuentasGA=cuentasGA)
+        seleccion=(request.form.getlist('cuentas'))
+        print(seleccion) 
+           
+        for item in seleccion:
+            print(item)
+            cursor_data=conn.cursor()
+            cursor_data.execute("SELECT \
+            DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
+            FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+            ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",item)
+            registrosCuenta = cursor_data.fetchall() 
+            list.append(registrosCuenta)
+            conn.commit() 
+        print(list)                     
+             
+            
+
+    return render_template('/comparativo.html',cuentasGA=cuentasGA, registrosCuenta=list)
 
 
 @app.route('/exportarGrafico/<int:id>', methods=['GET', 'POST'])

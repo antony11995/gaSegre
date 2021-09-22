@@ -15,7 +15,62 @@
     <br>
     <input type="submit" value="Comparar">
     </div>             
+    
+    <canvas class="my-4" id="myChart" width="900" height="600" ></canvas>
+    <script>
         
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+                }
+        fillcolor = getRandomColor()        
+        var ctx = document.getElementById("myChart");
+        var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+                         
+            labels: [
+            {% for registro in registrosCuenta %}
+            "{{ registro [0]}}",
+            {% endfor %}
+            
+
+            ],
+                      
+            datasets: [{
+              label: 'Sesiones',  
+              data: [
+              {% for sesiones in registrosCuenta %}
+              "{{ sesiones [2]}}",
+              {% endfor %}
+            
+            ],
+              lineTension: 0,
+              backgroundColor: 'transparent',
+              borderColor: fillcolor,
+              borderWidth: 4,
+              pointBackgroundColor: fillcolor
+            }]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: false
+                }
+              }]
+            },
+            legend: {
+              display: false,
+            }
+          }
+        });
+      </script>
         
 
         

@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, request, redirect, url_for, make_response
+from flask import render_template, request, redirect, url_for, make_response, json
 from flaskext.mysql import MySQL
 import pdfkit
 from werkzeug.wrappers import response
@@ -110,25 +110,32 @@ def comparativo():
     cuentasGA = cursor.fetchall() 
     conn.commit()
     list = []
+    registrosCuenta =()
+    etiquetas =()
+    valores=()
     if request.method == 'POST':
         seleccion=(request.form.getlist('cuentas'))
         print(seleccion) 
            
         for item in seleccion:
-            print(item)
+            #print(item)
             cursor_data=conn.cursor()
             cursor_data.execute("SELECT \
             DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
             FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
             ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",item)
-            registrosCuenta = cursor_data.fetchall() 
+            registrosCuenta = cursor_data.fetchall()
+            etiquetas =[row[0] for row in registrosCuenta]
+            valores=[row[2] for row in registrosCuenta]
             list.append(registrosCuenta)
-            conn.commit() 
-        print(list)                     
+            conn.commit()
+             
+        print(list)
+    return render_template('/comparativo.html',cuentasGA=cuentasGA, etiquetas=etiquetas,valores=valores)                            
              
             
 
-    return render_template('/comparativo.html',cuentasGA=cuentasGA, registrosCuenta=list)
+    
 
 
 @app.route('/exportarGrafico/<int:id>', methods=['GET', 'POST'])

@@ -28,28 +28,24 @@
             }
             return color;
                 }
-        fillcolor = getRandomColor()        
+        fillcolor = getRandomColor()   
+        
         var ctx = document.getElementById("myChart");
         var myChart = new Chart(ctx, {
           type: 'line',
           data: {
                          
-            labels: [
-            {% for registro in registrosCuenta %}
-            "{{ registro [0]}}",
-            {% endfor %}
+            labels: 
+            
+            {{ etiquetas | safe }}
+            
             
 
-            ],
+            ,
                       
             datasets: [{
               label: 'Sesiones',  
-              data: [
-              {% for sesiones in registrosCuenta %}
-              "{{ sesiones [2]}}",
-              {% endfor %}
-            
-            ],
+              data: {{ valores | safe }},
               lineTension: 0,
               backgroundColor: 'transparent',
               borderColor: fillcolor,
@@ -66,7 +62,7 @@
               }]
             },
             legend: {
-              display: false,
+              display: true,
             }
           }
         });

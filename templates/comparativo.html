@@ -9,11 +9,12 @@
     <br>
     <div class="custom-control custom-checkbox">
     {% for cuenta in cuentasGA %} 
-    <input type="checkbox" name="cuentas" value="{{cuenta[0]}}"/>
-    <label for="{{cuenta[0]}}">{{cuenta[1]}}</label> <br>
+     
+    <button type="button" onclick="agregarCuenta({{cuenta[0]}})" class="btn btn-primary" >{{cuenta[1]}}</button>
+    <!--<input type="button" name="cuentas" value="{{cuenta[0]}}"/>
+    <label for="{{cuenta[0]}}">{{cuenta[1]}}</label>--> 
     {% endfor %}
-    <br>
-    <input type="submit" value="Comparar">
+   
     </div>             
     
     <canvas class="my-4" id="myChart" width="900" height="600" ></canvas>
@@ -28,44 +29,102 @@
             }
             return color;
                 }
-        fillcolor = getRandomColor()   
+        fillcolor = getRandomColor()  
         
-        var ctx = document.getElementById("myChart");
-        var myChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-                         
-            labels: 
-            
-            {{ etiquetas | safe }}
-            
-            
+        // setup 
+    const data = {
+      labels: [{% for item in registrosCuenta %}
+            "{{ item [0]}}",
+            {% endfor %}],
+      datasets: [{
+         label: 'Comparativo',
+        // data: [18, 12, 6, 9, 12, 3, 9],
+        // backgroundColor: 'transparent',
+        // borderColor: fillcolor,
+        // borderWidth: 4,
+        // pointBackgroundColor: fillcolor
+      }]
+    };
 
-            ,
-                      
-            datasets: [{
-              label: 'Sesiones',  
-              data: {{ valores | safe }},
-              lineTension: 0,
-              backgroundColor: 'transparent',
-              borderColor: fillcolor,
-              borderWidth: 4,
-              pointBackgroundColor: fillcolor
-            }]
-          },
-          options: {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: false
-                }
-              }]
-            },
-            legend: {
-              display: true,
-            }
+    // config 
+    const config = {
+      type: 'line',
+      data,
+      options: {
+        scales: {
+          y: {
+            beginAtZero: false
           }
-        });
+        }
+      }
+    };
+
+    // render init block
+    const myChart = new Chart(
+      document.getElementById('myChart'),
+      config
+    );
+    function agregarCuenta(id) {
+      console.log(id.toString());
+      let valores=[];
+      {% for registro in registrosCuenta %}
+      var cuenta="{{ registro [4]}}"
+      if (cuenta==id){
+      
+      var etiqueta ="{{ registro [3]}}"
+      valores.push("{{ registro [2]}}");
+       
+      }
+              
+      
+      {% endfor %}
+      
+      console.log(valores);
+     
+      const newDataset={
+        label: etiqueta ,
+        data:valores,
+        backgroundColor: 'transparent',
+        borderColor: getRandomColor(),
+        borderWidth: 4,
+        pointBackgroundColor: getRandomColor()
+        
+
+      };
+      myChart.data.datasets.push(newDataset);
+      myChart.update();
+
+            
+                }
+        // var ctx = document.getElementById("myChart");
+        // var myChart = new Chart(ctx, {
+        //   type: 'line',
+        //   data : {
+        //     labels: 
+        //     //{{ etiquetas | safe }},
+        //     datasets: [{
+        //       label: 'Sesiones',  
+        //       data: {{ valores | safe }},
+        //       lineTension: 0,
+        //       backgroundColor: 'transparent',
+        //       borderColor: fillcolor,
+        //       borderWidth: 4,
+        //       pointBackgroundColor: fillcolor
+        //     }]
+        //   },
+        //   options: {
+        //     scales: {
+        //       yAxes: [{
+        //         ticks: {
+        //           beginAtZero: false
+        //         }
+        //       }]
+        //     },
+        //     legend: {
+        //       display: true,
+        //     }
+        //   }
+        // });
       </script>
         
 

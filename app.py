@@ -12,16 +12,25 @@ app.config['MYSQL_DATABASE_PASSWORD']='ga.segre'
 app.config['MYSQL_DATABASE_DB']='gasegre'
 mysql.init_app(app)
 
-
-
-@app.route('/')
-def index():
+@app.route('/allAccounts')
+def allAccounts():
     sql="SELECT * FROM `cuentas_ga`;"
     conn=mysql.connect()
     cursor=conn.cursor()
     cursor.execute(sql)
     cuentasGA = cursor.fetchall() 
     conn.commit()
+    return cuentasGA
+
+@app.route('/')
+def index():
+    # sql="SELECT * FROM `cuentas_ga`;"
+    # conn=mysql.connect()
+    # cursor=conn.cursor()
+    # cursor.execute(sql)
+    # cuentasGA = cursor.fetchall() 
+    # conn.commit()
+    cuentasGA=allAccounts()
     return render_template('/index.html',cuentasGA=cuentasGA)
 
 @app.route('/consultaporNombre/<int:id>')
@@ -103,52 +112,65 @@ def chart(id,sl):
 
 @app.route('/comparativo', methods=['GET', 'POST'])
 def comparativo():
-    sql="SELECT * FROM `cuentas_ga`;"
     conn=mysql.connect()
     cursor=conn.cursor()
-    cursor.execute(sql)
-    cuentasGA = cursor.fetchall() 
-    conn.commit()
-    list = []
-    registrosCuenta =()
-    etiquetas =()
-    valores=()
-    if request.method == 'POST':
-        seleccion=(request.form.getlist('cuentas'))
-        print(seleccion) 
+    cursor.execute("SELECT\
+    DATE_FORMAT(t1.`fecha`, '%d/%m/%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`,t2.`id`\
+    FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+    ON t1.id_cuenta = t2.id  ORDER BY fecha")
+    registrosCuenta = cursor.fetchall() 
+    
+    conn.commit() 
+    cuentasGA = allAccounts()
+    etiquetas =[row[0] for row in registrosCuenta]
+    print(registrosCuenta)
+    # list = []
+    # registrosCuenta =()
+    # etiquetas =()
+    # valores=()
+    # if request.method == 'POST':
+    #     seleccion=(request.form.getlist('cuentas'))
+    #     print(seleccion) 
            
-        for item in seleccion:
-            #print(item)
-            cursor_data=conn.cursor()
-            cursor_data.execute("SELECT \
-            DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`\
-            FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
-            ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",item)
-            registrosCuenta = cursor_data.fetchall()
-            etiquetas =[row[0] for row in registrosCuenta]
-            valores=[row[2] for row in registrosCuenta]
-            list.append(registrosCuenta)
-            conn.commit()
+    #     for item in seleccion:
+    #         #print(item)
+    #         cursor_data=conn.cursor()
+    #         cursor_data.execute("SELECT \
+    #         DATE_FORMAT(t1.`fecha`, '%%d/%%m/%%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`id`\
+    #         FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+    #         ON t1.id_cuenta = t2.id WHERE t2.id=%s ORDER BY fecha",item)
+    #         registrosCuenta = cursor_data.fetchall()
+    #         etiquetas =[row[0] for row in registrosCuenta]
+    #         valores=[row[2] for row in registrosCuenta]
+    #         list.append(registrosCuenta)
+    #         conn.commit()
              
-        print(list)
-    return render_template('/comparativo.html',cuentasGA=cuentasGA, etiquetas=etiquetas,valores=valores)                            
-             
-            
+    #     print(list)
+  
+    return render_template('/comparativo.html',cuentasGA=cuentasGA,etiquetas=etiquetas,registrosCuenta=registrosCuenta)                            
+@app.route('/test/<int:id>') 
+def test(id):
+    print("llamado correcto", id)
+
+    return render_template('/comparativo.html')         
+         
 
     
 
 
 @app.route('/exportarGrafico/<int:id>', methods=['GET', 'POST'])
 def exportarGrafico(id):
-    rendered=chart(id)
+       rendered=chart(id)
     #pdf=pdfkit.from_string(rendered,False)
-    pdfkit.from_file('/chart.html','out.pdf')
+       pdfkit.from_file('/chart.html','out.pdf')
     # response=make_response(pdf)
     # response.headers['Content-Type']='application/pdf'
     # response.headers['Content-Disposition']='inline;filename=output.pdf'
-    return render_template('/')
+       return render_template('/')
 
 if __name__=='__main__':
-    app.run(debug=True)
+       app.run(debug=True)
+
+
 
   

@@ -33,11 +33,14 @@
         
         // setup 
     const data = {
-      labels: [{% for item in registrosCuenta %}
-            "{{ item [0]}}",
-            {% endfor %}],
+      labels: 
+      {{ etiquetas | safe }}
+        // {% for item in registrosCuenta %}
+        //     "{{ item [0]}}",
+        //     {% endfor %}
+          ,
       datasets: [{
-         label: 'Comparativo',
+        // label: 'Comparativo',
         // data: [18, 12, 6, 9, 12, 3, 9],
         // backgroundColor: 'transparent',
         // borderColor: fillcolor,
@@ -51,12 +54,24 @@
       type: 'line',
       data,
       options: {
-        scales: {
-          y: {
-            beginAtZero: false
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: false
+                }
+              }]
+            },
+            legend: {
+              display: true,
+            }
           }
-        }
-      }
+      // options: {
+      //   scales: {
+      //     y: {
+      //       beginAtZero: false
+      //     }
+      //   }
+      // }
     };
 
     // render init block
@@ -73,17 +88,18 @@
       
       var etiqueta ="{{ registro [3]}}"
       valores.push("{{ registro [2]}}");
-       
+      
       }
               
       
       {% endfor %}
       
-      console.log(valores);
+     
      
       const newDataset={
         label: etiqueta ,
         data:valores,
+        lineTension: 0,
         backgroundColor: 'transparent',
         borderColor: getRandomColor(),
         borderWidth: 4,
@@ -94,7 +110,7 @@
       myChart.data.datasets.push(newDataset);
       myChart.update();
 
-            
+      console.log(valores);      
                 }
         // var ctx = document.getElementById("myChart");
         // var myChart = new Chart(ctx, {

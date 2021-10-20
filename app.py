@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, request, redirect, url_for, make_response, json
 from flaskext.mysql import MySQL
+from datetime import datetime
 import pdfkit
 from werkzeug.wrappers import response
 
@@ -114,16 +115,30 @@ def chart(id,sl):
 def comparativo():
     conn=mysql.connect()
     cursor=conn.cursor()
-    cursor.execute("SELECT\
-    DATE_FORMAT(t1.`fecha`, '%d/%m/%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`,t2.`id`\
-    FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
-    ON t1.id_cuenta = t2.id  ORDER BY fecha")
+    cursor.execute("SELECT \
+            DATE_FORMAT(t1.`fecha`, '%d/%m/%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`,t2.`id`\
+            FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+            ON t1.id_cuenta = t2.id WHERE fecha>='2021-07-17'ORDER BY fecha ASC LIMIT 60;")
+    # cursor.execute("SELECT\
+    # DATE_FORMAT(t1.`fecha`, '%d/%m/%Y'),t1.`duracion_sesion`,t1.`sesiones`,t2.`nombre`,t2.`id`\
+    # FROM sesiones_ga t1 INNER JOIN `cuentas_ga` t2 \
+    # ON t1.id_cuenta = t2.id  ORDER BY fecha")
     registrosCuenta = cursor.fetchall() 
     
     conn.commit() 
     cuentasGA = allAccounts()
     etiquetas =[row[0] for row in registrosCuenta]
-    print(registrosCuenta)
+    
+    
+    listaTemp = []
+ 
+    for x in etiquetas:
+        if x not in listaTemp:
+            listaTemp.append(x)
+ 
+    etiquetas = listaTemp
+    
+    print(etiquetas)
     # list = []
     # registrosCuenta =()
     # etiquetas =()
@@ -148,11 +163,18 @@ def comparativo():
     #     print(list)
   
     return render_template('/comparativo.html',cuentasGA=cuentasGA,etiquetas=etiquetas,registrosCuenta=registrosCuenta)                            
-@app.route('/test/<int:id>') 
-def test(id):
-    print("llamado correcto", id)
-
-    return render_template('/comparativo.html')         
+@app.route('/balance/<int:id>', methods=['POST','GET'])
+def balance(id):
+    conn=mysql.connect()
+    cursor=conn.cursor()
+    cursor.execute("SELECT \
+    DATE_FORMAT(t1.`fecha`, '%%m'),t1.`usuarios`\
+    FROM usuarios_unica_sesion_ga t1 INNER JOIN `cuentas_ga` t2 \
+    ON t1.id_cuenta = t2.id WHERE  t2.id=%s   GROUP BY MONTH(t1.`fecha`) DESC",id)
+    registrosCuenta = cursor.fetchall() 
+    conn.commit()  
+    nombreCuenta=consultaporNombre(id)
+    return render_template('/balance.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta,id=id)        
          
 
     

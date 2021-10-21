@@ -2,6 +2,7 @@ from flask import Flask
 from flask import render_template, request, redirect, url_for, make_response, json
 from flaskext.mysql import MySQL
 from datetime import datetime
+import numpy as np
 import pdfkit
 from werkzeug.wrappers import response
 
@@ -168,11 +169,16 @@ def balance(id):
     conn=mysql.connect()
     cursor=conn.cursor()
     cursor.execute("SELECT \
-    DATE_FORMAT(t1.`fecha`, '%%m'),t1.`usuarios`\
+    sum(t1.`usuarios`), DATE_FORMAT (t1.`fecha`,'%%M %%Y') AS fechaGrupo\
     FROM usuarios_unica_sesion_ga t1 INNER JOIN `cuentas_ga` t2 \
-    ON t1.id_cuenta = t2.id WHERE  t2.id=%s   GROUP BY MONTH(t1.`fecha`) DESC",id)
+    ON t1.id_cuenta = t2.id WHERE  t2.id=%s GROUP BY fechaGrupo ORDER BY MONTHNAME(fechaGrupo) ",id)   
     registrosCuenta = cursor.fetchall() 
+    valores=[int(row[0]) for row in registrosCuenta]
     conn.commit()  
+    print(valores)
+
+    # my_array = np.array(valores)
+    # print((my_array)*2)
     nombreCuenta=consultaporNombre(id)
     return render_template('/balance.html',registrosCuenta=registrosCuenta,nombreCuenta=nombreCuenta,id=id)        
          
@@ -180,15 +186,7 @@ def balance(id):
     
 
 
-@app.route('/exportarGrafico/<int:id>', methods=['GET', 'POST'])
-def exportarGrafico(id):
-       rendered=chart(id)
-    #pdf=pdfkit.from_string(rendered,False)
-       pdfkit.from_file('/chart.html','out.pdf')
-    # response=make_response(pdf)
-    # response.headers['Content-Type']='application/pdf'
-    # response.headers['Content-Disposition']='inline;filename=output.pdf'
-       return render_template('/')
+
 
 if __name__=='__main__':
        app.run(debug=True)
